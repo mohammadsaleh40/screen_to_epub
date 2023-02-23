@@ -2,8 +2,11 @@ import numpy as np
 import cv2 as cv
 import time
 import mss
+import pytesseract
 import tkinter as tk
 
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+langs = ['fa', 'eng']
 chaharchoob = {"top": 0, "left": 0, "width": 0, "height": 0}
 
 def update_screenshot(top, left, width, height):
@@ -48,7 +51,7 @@ height_entry.grid(row=3, column=1)
 set_button = tk.Button(root, text="Set Region", command=set_region)
 set_button.grid(row=4, column=0, columnspan=2)
 root.mainloop()
-
+last_text = ""
 with mss.mss() as sct:
     cv.namedWindow("salam")
     sct_img = sct.grab(sct.monitors[1])
@@ -61,9 +64,13 @@ with mss.mss() as sct:
         
         screenshot_array = np.array(sct_img)
         gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
-        
+        text = pytesseract.image_to_string(gray , lang='fas+eng')
+
         cv.imshow("salam", gray)
         key = cv.waitKey(10)
         if key == ord('q'):
             cv.destroyAllWindows()
             break
+        if text != last_text:
+            last_text = text
+            print(last_text)
