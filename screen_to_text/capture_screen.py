@@ -4,9 +4,11 @@ import time
 import mss
 import pytesseract
 import tkinter as tk
+from pytesseract import Output
+
 
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
-langs = ['fa', 'eng']
+
 chaharchoob = {"top": 0, "left": 0, "width": 0, "height": 0}
 
 def update_screenshot(top, left, width, height):
@@ -34,43 +36,77 @@ def set_region():
 root = tk.Tk()
 top_label = tk.Label(root, text="Top:")
 top_label.grid(row=0, column=0)
-top_entry = tk.Entry(root)
+text = tk.StringVar()
+text.set("200")
+top_entry = tk.Entry(root , textvariable = text)
 top_entry.grid(row=0, column=1)
 left_label = tk.Label(root, text="Left:")
 left_label.grid(row=1, column=0)
-left_entry = tk.Entry(root)
+text = tk.StringVar()
+text.set("1000")
+left_entry = tk.Entry(root , textvariable = text)
 left_entry.grid(row=1, column=1)
 width_label = tk.Label(root, text="Width:")
 width_label.grid(row=2, column=0)
-width_entry = tk.Entry(root)
+text = tk.StringVar()
+text.set("850")
+width_entry = tk.Entry(root , textvariable = text)
 width_entry.grid(row=2, column=1)
 height_label = tk.Label(root, text="Height:")
 height_label.grid(row=3, column=0)
-height_entry = tk.Entry(root)
+text = tk.StringVar()
+text.set("500")
+height_entry = tk.Entry(root , textvariable = text)
 height_entry.grid(row=3, column=1)
 set_button = tk.Button(root, text="Set Region", command=set_region)
 set_button.grid(row=4, column=0, columnspan=2)
 root.mainloop()
 last_text = ""
+matn = ""
+last_screenshot_array = np.array([])
 with mss.mss() as sct:
     cv.namedWindow("salam")
     sct_img = sct.grab(sct.monitors[1])
     print(chaharchoob)    
     #chaharchoob = {"top": int(top_entry.get()), "left": int(left_entry.get()), "width": int(width_entry.get()), "height": int(height_entry.get())}
+    sct_img = sct.grab(chaharchoob)
+        
+    screenshot_array = np.array(sct_img)
+    screenshot_center = screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
+    print(screenshot_center)
+    gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
+    img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
+        
     while True:
         
         
         sct_img = sct.grab(chaharchoob)
         
         screenshot_array = np.array(sct_img)
-        gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
-        text = pytesseract.image_to_string(gray , lang='fas+eng')
+        if not np.all(screenshot_center == screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]):
+            matn = ""
+            screenshot_center = screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
+            
+            gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
+            img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
+            print(img_data)
+        
+            for index,text in enumerate(img_data['text']):
+                if img_data["conf"][index]!=-1:
+                    x1= int(img_data['left'][index])
+                    y1= int(img_data['top'][index])
+                    x2 = x1 + int(img_data['width'][index])
+                    y2 = y1 + int(img_data['height'][index])
+                    cv.rectangle(gray, (x1, y1), (x2, y2), (85,70,60), 1)
+                    f = open("file.txt" , "a")
+                    f.write(img_data["text"][index]+" ")
+                    f.close()
 
         cv.imshow("salam", gray)
-        key = cv.waitKey(10)
+        key = cv.waitKey(5)
         if key == ord('q'):
             cv.destroyAllWindows()
             break
-        if text != last_text:
-            last_text = text
-            print(last_text)
+        
+            
+            
