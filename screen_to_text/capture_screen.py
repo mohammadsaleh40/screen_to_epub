@@ -64,6 +64,7 @@ root.mainloop()
 last_text = ""
 matn = ""
 last_screenshot_array = np.array([])
+#chand_omin_ax = 0
 with mss.mss() as sct:
     cv.namedWindow("salam")
     sct_img = sct.grab(sct.monitors[1])
@@ -73,7 +74,7 @@ with mss.mss() as sct:
         
     screenshot_array = np.array(sct_img)
     screenshot_center = screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
-    print(screenshot_center)
+    #print(screenshot_center)
     gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
     img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
         
@@ -89,7 +90,7 @@ with mss.mss() as sct:
             
             gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
             img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
-            print(img_data)
+            #print(img_data)
         
             for index,text in enumerate(img_data['text']):
                 if img_data["conf"][index]!=-1:
@@ -98,10 +99,13 @@ with mss.mss() as sct:
                     x2 = x1 + int(img_data['width'][index])
                     y2 = y1 + int(img_data['height'][index])
                     cv.rectangle(gray, (x1, y1), (x2, y2), (85,70,60), 1)
-                    f = open("file.txt" , "a")
-                    f.write(img_data["text"][index]+" ")
-                    f.close()
-
+                    matn+=img_data["text"][index]+" "
+                    
+            f = open("file.txt" , "a")
+            f.write(matn)
+            f.close()
+            #cv.imwrite("example_pictures/h_"+str(chand_omin_ax)+".jpg" , gray)
+            #chand_omin_ax+=1
         cv.imshow("salam", gray)
         key = cv.waitKey(5)
         if key == ord('q'):
