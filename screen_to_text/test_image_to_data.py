@@ -28,10 +28,10 @@ for i in range(
     for i in range(len(img_data["text"])):
         
         if img_data["level"][i] ==5:
-            if img_data["line_num"][i] in lines:
-                lines[img_data["line_num"][i]].append(img_data["text"][i])
+            if img_data["line_num"][i] not in lines:
+                lines[img_data["line_num"][i]] = img_data["text"][i]+" "
             else:
-                lines[img_data["line_num"][i]] = [img_data["text"][i]]
+                lines[img_data["line_num"][i]] += img_data["text"][i]+" "
     list_lines.append(lines)
 
     #print(img_data)
@@ -67,15 +67,17 @@ lines ={}
 for i in range(len(img_data["text"])):
     
     if img_data["level"][i] ==5:
-        if img_data["line_num"][i] in lines:
-            lines[img_data["line_num"][i]].append(img_data["text"][i])
+        if img_data["line_num"][i] not in lines:
+            lines[img_data["line_num"][i]] = img_data["text"][i]+" "
         else:
-            lines[img_data["line_num"][i]] = [img_data["text"][i]]
-
+            lines[img_data["line_num"][i]] += img_data["text"][i]+" "
 lines
+
 # %%
 def moshabehat(l1 , l2):
     r = 0
+    l1 = l1.split(" ")
+    l2 = l2.split(" ")
     for i in range(min(len(l1),len(l2))):
         if l1[i] == l2[i]:
             r+=1
@@ -94,4 +96,6 @@ list_lines[16]
 lines
 # %%
 len(list_lines[16])
+# %%
+img_data
 # %%
