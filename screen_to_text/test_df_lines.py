@@ -5,7 +5,7 @@ import cv2 as cv
 import pandas as pd
 # %%
 def list_lines_to_df(list_lines):
-
+    
 
 
 # ایده اینه که خطوط رو بدیم به دیتا فریم‌ها و بعد خروجی هر دفعه که تصویر جدید رو چک می‌کردیم با دیتا فریم اصلی مقایسه کنیم.
