@@ -5,8 +5,10 @@ import mss
 import pytesseract
 import tkinter as tk
 from pytesseract import Output
-
-
+import os
+from functions import moshabehat , ezafe_df , img_to_df
+dirname = os.path.dirname(__file__)
+dirname
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
 chaharchoob = {"top": 0, "left": 0, "width": 0, "height": 0}
@@ -73,7 +75,7 @@ with mss.mss() as sct:
     sct_img = sct.grab(chaharchoob)
         
     screenshot_array = np.array(sct_img)
-    screenshot_center = screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
+    screenshot_center = screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
     #print(screenshot_center)
     gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
     img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
@@ -86,7 +88,7 @@ with mss.mss() as sct:
         screenshot_array = np.array(sct_img)
         if not np.all(screenshot_center == screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]):
             matn = ""
-            screenshot_center = screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
+            screenshot_center = screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
             
             gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
             img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
