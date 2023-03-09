@@ -8,6 +8,8 @@ import tkinter as tk
 from pytesseract import Output
 import os
 def moshabehat(l1 , l2):
+    if len(l1)<2:
+        return 0
     r = 0
     l1 = l1.split(" ")
     l2 = l2.split(" ")
@@ -25,6 +27,7 @@ def img_to_df(img , df):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
     lines ={}
+    shorooa = -1
     for i in range(len(img_data["text"])):
         
         if img_data["level"][i] ==4 and line_num==1:
@@ -39,6 +42,10 @@ def img_to_df(img , df):
         elif img_data["level"][i] ==5:
             matn += img_data["text"][i]+" "
             sehat+= img_data["conf"][i]
+    if shorooa == -1:
+        print("-*-*-*-")
+        print(df)
+        return df
     for i in range(shorooa ,len(img_data["text"])):
         if img_data["level"][i] ==4:
             df = df.append({"line_num":line_num , "matn":matn , "width":width , "sehat":sehat}, ignore_index=True )

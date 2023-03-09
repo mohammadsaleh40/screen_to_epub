@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import cv2 as cv
 import time
@@ -57,7 +58,7 @@ width_entry.grid(row=2, column=1)
 height_label = tk.Label(root, text="Height:")
 height_label.grid(row=3, column=0)
 text = tk.StringVar()
-text.set("500")
+text.set("840")
 height_entry = tk.Entry(root , textvariable = text)
 height_entry.grid(row=3, column=1)
 set_button = tk.Button(root, text="Set Region", command=set_region)
@@ -77,7 +78,9 @@ with mss.mss() as sct:
     screenshot_array = np.array(sct_img)
     screenshot_center = screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
     #print(screenshot_center)
+    df = pd.DataFrame(columns=["line_num" , "matn" , "width", "sehat"])
     gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
+    df = img_to_df(screenshot_array, df)
     img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
         
     while True:
@@ -86,26 +89,26 @@ with mss.mss() as sct:
         sct_img = sct.grab(chaharchoob)
         
         screenshot_array = np.array(sct_img)
-        if not np.all(screenshot_center == screenshot_array[chaharchoob["height"]*25//50:chaharchoob["height"]*26//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]):
-            matn = ""
+        if not np.all(screenshot_center == screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]):
+            #matn = ""
             screenshot_center = screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
-            
+            df_t = pd.DataFrame(columns=["line_num" , "matn" , "width", "sehat"])
             gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
+            df_t = img_to_df(screenshot_array, df_t)
+            df = ezafe_df(df, df_t)
+            print("*-*-*-*-*<<",len(df),">>*-*-*--*-*-*")
             img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
             #print(img_data)
         
             for index,text in enumerate(img_data['text']):
-                if img_data["conf"][index]!=-1:
+                if img_data["level"][index]==4:
                     x1= int(img_data['left'][index])
                     y1= int(img_data['top'][index])
                     x2 = x1 + int(img_data['width'][index])
                     y2 = y1 + int(img_data['height'][index])
                     cv.rectangle(gray, (x1, y1), (x2, y2), (85,70,60), 1)
-                    matn+=img_data["text"][index]+" "
                     
-            f = open("file.txt" , "a")
-            f.write(matn)
-            f.close()
+            
             #cv.imwrite("example_pictures/h_"+str(chand_omin_ax)+".jpg" , gray)
             #chand_omin_ax+=1
         cv.imshow("salam", gray)
@@ -114,5 +117,9 @@ with mss.mss() as sct:
             cv.destroyAllWindows()
             break
         
-            
-            
+matn_chapter = ""
+for i in range(len(df)):
+    matn_chapter += df["matn"][i]
+f = open("file.txt" , "w")
+f.write(matn_chapter)
+f.close()
