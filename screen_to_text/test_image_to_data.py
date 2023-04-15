@@ -9,10 +9,13 @@ import tkinter as tk
 from pytesseract import Output
 import os
 from functions import moshabehat , ezafe_df , img_to_df
+import subprocess
 dirname = os.path.dirname(__file__)
 dirname
 # %%
 
+
+t0 = time.time()
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
 # %%
@@ -27,7 +30,7 @@ for j in range(1,
     #1
     #2
     #4,5
-    20
+    10
     #100
     ):
     df_llines_t = pd.DataFrame(columns=["line_num" , "matn" , "width", "sehat"])
@@ -52,8 +55,9 @@ for i in range(len(df_llines)):
 f = open("file.txt" , "w")
 f.write(matn_chapter)
 f.close()
+print(time.time() - t0)
 # %%
-df_llines.to_csv("data_0_20.csv")
+df_llines.to_csv("data_0_20_concat.csv")
 
 # %%
 #img_data.keys()
@@ -62,6 +66,39 @@ df_llines_t
 
 # %%
 df_llines
+# %%
+# dirname+"/example_pictures/h_0.jpg"
+# tesseract images/eurotext.png - -l eng hocr
+t0 = time.time()
+
+cmd_args = ["tesseract" , dirname+"/example_pictures/h_56.jpg","-" , "-l" , "eng+fas" , "tsv" ]
+
+subprocess.run(cmd_args)
+print(time.time()-t0)
+# %%
+dirname+"/example_pictures/h_56.jpg", dirname+"/example_pictures/h_57.jpg"
+
+
+# %%
+t0 = time.time()
+df_llines = pd.DataFrame(columns=["line_num" , "matn" , "width", "sehat"])
+
+img = cv.imread(dirname+"/example_pictures/h_56.jpg")
+df_llines = img_to_df(img, df_llines)
+print(time.time()-t0)
+df_llines
+
+
+# %%
+gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DATAFRAME)
+img_data
+
+
+
+
+
+
 # %%
 gg = gray.copy()
 for i in range(len(img_data["level"])):

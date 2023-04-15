@@ -3,5 +3,7 @@
 /screen_to_text/data1.csv
 /screen_to_text/data.csv
 /screen_to_text/example_pictures/*.jpg
+/screen_to_text/example_pictures/*.png
 /books
 /screen_to_text/__pycache__
+Panorama Stitching using OpenCV Python.mp4

@@ -35,6 +35,16 @@ def set_region():
     height = int(height_entry.get())
     update_screenshot(top, left, width, height)
     root.destroy()
+ignore_list = []
+tasvir_list = []
+def mouse_click(event, x, y, 
+                flags, param):
+    global ignore_list , tasvir_list
+    if event == cv.EVENT_LBUTTONDOWN and param == 'i':
+        ignore_list.append([x , y])
+    if event == cv.EVENT_LBUTTONDOWN and param == 't':
+        tasvir_list.append([x , y])
+
 
 root = tk.Tk()
 top_label = tk.Label(root, text="Top:")
@@ -82,32 +92,34 @@ with mss.mss() as sct:
     gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
     df = img_to_df(screenshot_array, df)
     img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
-        
+    #shomare = 0
     while True:
-        
         
         sct_img = sct.grab(chaharchoob)
         
         screenshot_array = np.array(sct_img)
         if not np.all(screenshot_center == screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]):
             #matn = ""
+            #shomare+=1
+        
             screenshot_center = screenshot_array[chaharchoob["height"]*23//50:chaharchoob["height"]*28//50 , chaharchoob["width"]*25//50:chaharchoob["width"]*26//50]
             df_t = pd.DataFrame(columns=["line_num" , "matn" , "width", "sehat"])
             gray = cv.cvtColor(screenshot_array, cv.COLOR_BGR2GRAY)
+            gray = cv.cvtColor(gray , cv.COLOR_GRAY2BGR)
             df_t = img_to_df(screenshot_array, df_t)
             df = ezafe_df(df, df_t)
             print("*-*-*-*-*<<",len(df),">>*-*-*--*-*-*")
             img_data = pytesseract.image_to_data(gray, lang='fas+eng' , output_type=Output.DICT)
-            #print(img_data)
-        
+            
+            #cv.imwrite('/home/mohammadsaleh/program/python/screen_to_epub/screen_to_text/example_pictures/'+str(shomare)+'.png', gray)
             for index,text in enumerate(img_data['text']):
                 if img_data["level"][index]==4:
                     x1= int(img_data['left'][index])
                     y1= int(img_data['top'][index])
                     x2 = x1 + int(img_data['width'][index])
                     y2 = y1 + int(img_data['height'][index])
-                    cv.rectangle(gray, (x1, y1), (x2, y2), (85,70,60), 1)
-                    
+                    cv.rectangle(gray, (x1, y1), (x2, y2), (220,70,60), 1)
+                        
             
             #cv.imwrite("example_pictures/h_"+str(chand_omin_ax)+".jpg" , gray)
             #chand_omin_ax+=1
@@ -116,6 +128,11 @@ with mss.mss() as sct:
         if key == ord('q'):
             cv.destroyAllWindows()
             break
+        elif key == ord('i'):
+            cv.setMouseCallback('salam', mouse_click , 'i')
+        elif key == ord('t'):
+            cv.setMouseCallback('salam', mouse_click , 't')
+
         
 matn_chapter = ""
 for i in range(len(df)):

@@ -34,7 +34,7 @@ def img_to_df(img , df):
             shorooa = i
             break
         elif img_data["level"][i] ==4:
-            line_num+=1
+            line_num += 1
             width = img_data["width"][i]
             
             #print(line_num," " ,i)
@@ -77,10 +77,13 @@ def ezafe_df(df_llines , df_llines_t):
     # باید سعی کنم از concat استفاده کنم این جوری بهتره.
     try:
         df = df_llines.iloc[0:last_tupel[0]]
+        #df = pd.concat([df , df_llines_t ],  ignore_index=True )
         for i in range(last_tupel[1],len(df_llines_t)):
             df = df.append({"line_num":df_llines_t["line_num"][i]+len(df)-last_tupel[1] , "matn":df_llines_t["matn"][i] , "width":df_llines_t["width"][i] , "sehat":df_llines_t["sehat"][i]}, ignore_index=True )
     except(UnboundLocalError):
         df = df_llines
+        #df = pd.concat([df , df_llines_t ],  ignore_index=True )
+        
         for i in range(len(df_llines_t)):
             df = df.append({"line_num":df_llines_t["line_num"][i]+len(df) , "matn":df_llines_t["matn"][i] , "width":df_llines_t["width"][i] , "sehat":df_llines_t["sehat"][i]}, ignore_index=True )
             
