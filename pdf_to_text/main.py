@@ -29,7 +29,7 @@ def update_img():
 ignore_list = []
 tasvir_list = []
 def mouse_click(event, x, y, flags, param):
-    global ignore_list , tasvir_list , update_flag
+    global ignore_list , tasvir_list , update_flag , update_ocr
     # add
     if event == cv.EVENT_LBUTTONDOWN and param == 'i':
         ignore_list.append([int(x * (1/scale)) , int(y* (1/scale))])
@@ -77,20 +77,21 @@ pardazesh = asli.copy()
 # %%
 def read():
     i = pytesseract.image_to_data(pardazesh, lang='fas+eng' , output_type=Output.DATAFRAME)
+    #print(i)
     return i
 img_data = read()
 # %%
 def dorkesh():
     global namayesh , img_data 
     for i in range(len(img_data["level"])):
-        if img_data["level"][i] == 5:
+        if img_data["level"][i] == 3:
             index = i
             #print(img_data["text"][i])
             x1= int(img_data['left'][index])
             y1= int(img_data['top'][index])
             x2 = x1 + int(img_data['width'][index])
             y2 = y1 + int(img_data['height'][index])
-            zarib_sehat = img_data["conf"][index]
+            zarib_sehat = 100#img_data["conf"][index]
             cv.rectangle(namayesh ,  (x1, y1), (x2, y2), ((zarib_sehat*255)/100,(zarib_sehat*70)/100,(zarib_sehat*70)/100), 10)
 #dorkesh()
 # %%
@@ -102,6 +103,9 @@ while True:
     if update_flag:
         update_zaher()
         namayesh = pardazesh.copy()
+        if update_ocr:
+            update_img()
+            update_oct = False
         dorkesh()
         cv.putText(img = namayesh, text = t , org= (40 , 100),
             fontFace=cv.FONT_HERSHEY_TRIPLEX, fontScale=3,
@@ -109,9 +113,7 @@ while True:
             
         cv.imshow("salam", cv.resize(namayesh, (0,0),None , scale , scale))
         update_flag = False
-        if update_ocr:
-            update_img()
-            update_oct = False
+        
     key = cv.waitKey(5)
     if key == ord('q'):
         cv.destroyAllWindows()
